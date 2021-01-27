@@ -1,17 +1,53 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { Component } from "react";
+import "./assets/style.css";
+import ReactDom from "react-dom";
+import Login from "./components/login";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import quizService from "./quizService";
+import QuestionBox from "./components/QuestionBox";
+class OnlineExam extends Component{
+    state = {
+        questionBank : [],
+        score : 0,
+        responses : 0
+    };
+    getQuestions = () => {
+        quizService().then(question => {
+            this.setState({
+                questionBank : question
+            });
+        });
+    }
+    computeAnswer = (answer, correctAnswer) => {
+        if(answer === correctAnswer){
+            this.setState({
+                score : this.state.score + 1
+            })
+            
+        }
+        this.setState({
+            responses : this.state.responses < 5 ? this.state.responses + 1 : 5
+        });
+    }
+    componentDidMount(){
+        this.getQuestions();
+    }
+    render(){
+        return(
+            <div className="container">
+                <Login />
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+                {/*
+                <div className="title"> Hello World</div>
+                {this.state.questionBank.length > 0 && this.state.responses < 5 && this.state.questionBank.map(
+                    ({question,answers,correct,questionId}) => (
+                    <QuestionBox question={question} options={answers} key={questionId} selected={answer => this.computeAnswer(answer, correct)}/>
+                ))}
+                    */}
+                
+            </div>
+        );
+    }
+}
+
+ReactDom.render(<OnlineExam/>, document.getElementById("root"));
